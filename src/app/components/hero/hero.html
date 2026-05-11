@@ -1,0 +1,98 @@
+<!-- 480vh scroll driver -->
+<div class="hero-scroll-wrapper">
+  <div class="hero-sticky" id="hero">
+
+    <app-particle-background />
+    <div class="bg-glow bg-glow--blue"></div>
+    <div class="bg-glow bg-glow--cyan"></div>
+
+    <!-- ── Intro copy (fades out as scroll starts) ── -->
+    <div class="hero-intro"
+         [style.opacity]="introOpacity"
+         [style.pointer-events]="introOpacity < 0.05 ? 'none' : 'auto'">
+
+      <div class="intro-badge">
+        <span class="badge-dot"></span>
+        UK's Most Innovative Tech Partner
+      </div>
+
+      <h1 class="intro-headline">
+        Collaborate with<br>
+        the Most <span class="gradient-text">Innovative</span><br>
+        Tech Partner
+      </h1>
+
+      <p class="intro-sub">
+        Custom software, mobile, cloud &amp; AI — Techpotam engineers
+        digital transformation for UK businesses that mean business.
+      </p>
+
+      <div class="intro-cta">
+        <a href="https://www.techpotam.com/uk/#contact" target="_blank" class="cta-primary">
+          Free Consultation
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="https://www.techpotam.com/uk/" target="_blank" class="cta-ghost">Explore Services</a>
+      </div>
+
+      <div class="intro-stats">
+        <div class="istat" *ngFor="let s of stats">
+          <span class="istat__n">{{ s.number }}</span>
+          <span class="istat__l">{{ s.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Laptop — anchored at viewport centre, offset right initially ── -->
+    <div class="laptop-anchor" [style.transform]="'translateX(' + laptopShiftX + 'vw)'">
+      <app-laptop
+        [lidAngle]="lidAngle"
+        [tiltX]="tiltX"
+        [tiltY]="tiltY"
+        [laptopScale]="laptopScale">
+      </app-laptop>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="scroll-hint" [style.opacity]="introOpacity">
+      <div class="scroll-mouse"><div class="scroll-mouse__dot"></div></div>
+      <span>Scroll to enter</span>
+    </div>
+
+    <!-- Transition overlay -->
+    <div class="zoom-overlay" [style.opacity]="overlayOp"></div>
+  </div>
+</div>
+
+<!-- ── Services — revealed after laptop zoom ── -->
+<section class="services-reveal" id="services"
+         [style.opacity]="contentOp"
+         [style.transform]="'translateY(' + contentY + 'px)'">
+
+  <div class="sr-inner">
+    <div class="sr-header">
+      <div class="sr-tag">What We Build</div>
+      <h2 class="sr-title">Services That <span class="gradient-text">Transform</span> Businesses</h2>
+      <p class="sr-desc">End-to-end digital solutions for UK enterprises — from concept to deployment.</p>
+    </div>
+
+    <div class="sr-grid">
+      <div class="sr-card" *ngFor="let s of services">
+        <div class="sr-card__icon">{{ s.icon }}</div>
+        <h3 class="sr-card__title">{{ s.title }}</h3>
+        <p class="sr-card__desc">{{ s.desc }}</p>
+        <div class="sr-card__cta">
+          Learn more
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="sr-bottom-cta">
+      <a href="https://www.techpotam.com/uk/" target="_blank" class="cta-primary">
+        Visit Full Techpotam Site
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>

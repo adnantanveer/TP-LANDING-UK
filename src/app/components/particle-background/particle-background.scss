@@ -1,0 +1,32 @@
+.particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: particle-float linear infinite;
+  filter: blur(0.5px);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.2;
+    filter: blur(4px);
+  }
+}
+
+@keyframes particle-float {
+  0%   { opacity: 0;   transform: translateY(0) scale(0.5); }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.4; }
+  100% { opacity: 0;   transform: translateY(-60vh) scale(1.2); }
+}
