@@ -1,0 +1,374 @@
+// ── MacBook Silver palette ────────────────────────────────────────
+$al-shine:  #c4c8ce;
+$al-top:    #a8adb5;
+$al-mid:    #909499;
+$al-dark:   #6e7278;
+$al-edge:   #5a5f66;
+$al-shadow: #4a4f55;
+
+// ── Scene ─────────────────────────────────────────────────────────
+.mac-scene {
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+// ── Wrapper: 600 × 640px ──────────────────────────────────────────
+// Lid   = top 420px   (screen mid = 210px from top)
+// Base  = bottom 220px
+// Hero anchor uses margin: -210px top, -300px left → zoom targets screen
+.mac-wrapper {
+  position: relative;
+  width: 600px;
+  height: 640px;
+  transform-style: preserve-3d;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  LID
+//  top: 0, height: 420px
+//  transform-origin: center bottom  (hinge at bottom edge)
+//  rotateX(0)   → lid faces viewer  → aluminum visible = CLOSED look
+//  rotateX(-65) → lid tilted back   → screen visible  = OPEN
+// ══════════════════════════════════════════════════════════════════
+.mac-lid {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 420px;
+  transform-origin: center bottom;
+  will-change: transform;
+  z-index: 2;
+}
+
+// ── Aluminum back ─────────────────────────────────────────────────
+.lid-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px 12px 0 0;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 0.5px,
+      transparent 0.5px, transparent 2.5px),
+    radial-gradient(ellipse 140% 90% at 35% 15%,
+      $al-shine 0%, $al-top 28%, $al-mid 55%, $al-dark 80%, $al-shadow 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset -1px 0 0 rgba(0,0,0,0.06),
+    inset  1px 0 0 rgba(0,0,0,0.06),
+    inset 0 -2px 4px rgba(0,0,0,0.1),
+    0 2px 8px rgba(0,0,0,0.5);
+
+  &::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+    pointer-events: none;
+  }
+}
+
+.lid-back__shine {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 38%;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.lid-back__apple {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -52%);
+  width: 52px; height: 64px;
+
+  svg {
+    width: 100%; height: 100%;
+    fill: $al-shadow;
+    filter: drop-shadow(0 1px 0 rgba(255,255,255,0.18))
+            drop-shadow(0 -1px 0 rgba(0,0,0,0.25));
+    opacity: 0.72;
+  }
+}
+
+// ── Screen face ───────────────────────────────────────────────────
+.lid-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  will-change: opacity;
+}
+
+.screen-bezel {
+  flex: 1;
+  background: #0d0d0d;
+  border-radius: 14px 14px 0 0;
+  padding: 30px 6px 5px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07), 0 0 0 1px rgba(0,0,0,0.7);
+}
+
+.screen-notch {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 130px; height: 28px;
+  background: #0d0d0d;
+  border-radius: 0 0 18px 18px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+
+.notch-cam {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #181818;
+  border: 1.5px solid #252525;
+  box-shadow: inset 0 0 4px rgba(0,130,255,0.2);
+}
+
+.screen-chin {
+  height: 9px;
+  background: #111;
+  border-radius: 0 0 4px 4px;
+}
+
+.screen-display {
+  width: 100%; height: 100%;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  background: #050d1a;
+}
+
+.screen-glare {
+  position: absolute;
+  top: -15%; left: -30%;
+  width: 70%; height: 120%;
+  background: linear-gradient(110deg,
+    transparent 30%, rgba(255,255,255,0.04) 48%,
+    rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 52%, transparent 70%);
+  pointer-events: none;
+  z-index: 20;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TECHPOTAM SITE MOCKUP
+// ══════════════════════════════════════════════════════════════════
+.tp-site {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  background: #050d1a;
+  position: relative; overflow: hidden;
+
+  &::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,102,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,102,255,0.04) 1px, transparent 1px);
+    background-size: 18px 18px; z-index: 0;
+  }
+}
+
+.tp-nav {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px;
+  background: rgba(5,13,26,0.92);
+  border-bottom: 1px solid rgba(0,102,255,0.15);
+  flex-shrink: 0;
+
+  &__brand { display: flex; align-items: center; gap: 4px; }
+  &__links { display: flex; gap: 8px; font-size: 0.38rem; color: #7a8fa6; }
+  &__cta {
+    font-size: 0.38rem; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, #0066ff, #004fcc);
+    padding: 2px 8px; border-radius: 3px;
+  }
+}
+
+.tp-logo {
+  width: 18px; height: 18px; border-radius: 4px;
+  background: linear-gradient(135deg, #0066ff, #00c4ff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.4rem; font-weight: 900; gap: 0.5px;
+  span:first-child { color: #fff; }
+  span:last-child  { color: rgba(255,255,255,0.75); }
+}
+
+.tp-brand-name { font-size: 0.52rem; font-weight: 800; color: #fff; }
+
+.tp-hero {
+  position: relative; z-index: 2; flex: 1;
+  display: flex; align-items: center;
+  padding: 10px 12px; gap: 8px; overflow: hidden;
+
+  &::before {
+    content: ''; position: absolute;
+    top: -40%; right: -10%; width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,102,255,0.1), transparent 65%);
+    pointer-events: none;
+  }
+
+  &__left  { flex: 0 0 56%; display: flex; flex-direction: column; gap: 5px; }
+  &__right { flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+}
+
+.tp-badge {
+  display: inline-block; font-size: 0.38rem; font-weight: 600; color: #00c4ff;
+  background: rgba(0,196,255,0.1); border: 1px solid rgba(0,196,255,0.25);
+  border-radius: 20px; padding: 2px 7px; width: fit-content;
+}
+
+.tp-title {
+  font-size: 0.86rem; font-weight: 900;
+  color: #fff; line-height: 1.15; letter-spacing: -0.3px;
+}
+
+.tp-accent {
+  background: linear-gradient(135deg, #0066ff, #00c4ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.tp-sub { font-size: 0.38rem; color: #7a8fa6; }
+
+.tp-btns { display: flex; gap: 4px; margin-top: 2px; }
+.tp-btn {
+  font-size: 0.38rem; font-weight: 700; padding: 3px 8px; border-radius: 3px; cursor: default;
+  &--primary { background: linear-gradient(135deg, #0066ff, #004fcc); color: #fff; box-shadow: 0 0 8px rgba(0,102,255,0.4); }
+  &--ghost   { border: 1px solid rgba(0,102,255,0.3); color: #7a8fa6; }
+}
+
+.tp-trust { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 0.33rem; color: #4a5e72; }
+.tp-stars { color: #f59e0b; font-size: 0.35rem; }
+
+.tp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+.tp-card {
+  background: rgba(0,102,255,0.08); border: 1px solid rgba(0,102,255,0.18);
+  border-radius: 4px; padding: 4px 5px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  &__icon { font-size: 0.55rem; }
+  &__lbl  { font-size: 0.3rem; color: #7a8fa6; text-align: center; }
+}
+
+.tp-metric-live {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(0,196,255,0.08); border: 1px solid rgba(0,196,255,0.2);
+  border-radius: 20px; padding: 2px 7px; font-size: 0.33rem; color: #00c4ff;
+}
+
+.live-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #00c4ff; box-shadow: 0 0 5px #00c4ff;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.tp-stats {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-around;
+  padding: 5px 12px;
+  background: rgba(0,102,255,0.06); border-top: 1px solid rgba(0,102,255,0.12);
+  flex-shrink: 0;
+}
+
+.tp-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.ts-n {
+  font-size: 0.55rem; font-weight: 800;
+  background: linear-gradient(135deg, #0066ff, #00c4ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.ts-l { font-size: 0.28rem; color: #4a5e72; text-transform: uppercase; letter-spacing: 0.3px; }
+
+// ══════════════════════════════════════════════════════════════════
+//  BASE (keyboard) — bottom 130px, hidden when closed
+// ══════════════════════════════════════════════════════════════════
+.mac-base {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  will-change: opacity;
+  z-index: 1;
+}
+
+.base-deck {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 0.5px,
+      transparent 0.5px, transparent 2.5px),
+    radial-gradient(ellipse 120% 70% at 50% 0%,
+      $al-shine 0%, $al-top 20%, $al-mid 55%, $al-dark 85%, $al-shadow 100%);
+  padding: 6px 8px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+.base-fn-strip {
+  width: 92%; height: 4px;
+  background: #1c1c1c;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.1);
+  overflow: hidden; position: relative;
+
+  &::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+      transparent, rgba(0,102,255,0.6), rgba(0,196,255,0.6), rgba(0,102,255,0.6), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    opacity: 0.7;
+  }
+}
+
+// Keyboard matches screen width (92%)
+.mac-keyboard { width: 92%; display: flex; flex-direction: column; gap: 2px; }
+.kb-row { display: flex; gap: 2px; }
+.kb-key {
+  height: 16px;
+  background: linear-gradient(180deg, #b2b7be 0%, #9ea3aa 40%, #868b92 100%);
+  border-radius: 3px;
+  box-shadow:
+    0 2px 0 #3c4148,
+    0 3px 5px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+  min-width: 6px;
+}
+
+.base-trackpad {
+  width: 42%; height: 62px;
+  background: linear-gradient(145deg, $al-mid, $al-dark);
+  border-radius: 7px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.base-edge {
+  height: 10px;
+  background: linear-gradient(180deg, $al-dark 0%, $al-edge 60%, $al-shadow 100%);
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+// ── Hinge line ────────────────────────────────────────────────────
+.mac-hinge {
+  position: absolute;
+  bottom: 220px; left: 50%;
+  transform: translateX(-50%);
+  width: 56%; height: 3px;
+  background: linear-gradient(90deg, transparent, $al-dark 15%, $al-edge 50%, $al-dark 85%, transparent);
+  border-radius: 2px;
+  z-index: 3;
+}
+
+// ── Desk glow ─────────────────────────────────────────────────────
+.mac-glow {
+  position: absolute;
+  bottom: -20px; left: 50%;
+  transform: translateX(-50%);
+  width: 70%; height: 28px;
+  background: radial-gradient(ellipse, rgba(0,102,255,0.38) 0%, transparent 70%);
+  filter: blur(14px);
+  animation: pulse-glow 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
