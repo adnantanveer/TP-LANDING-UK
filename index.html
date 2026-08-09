@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Techpotam. Software, built right.</title>
+  <meta name="description" content="Techpotam Pvt Ltd. A cinematic scroll through how we design, build, and ship software products." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css" />
+  <style>
+    :root, .sw-root {
+      --sw-bg: #06070b;
+      --sw-ink: #ffffff;
+      --sw-ink-soft: #a7afc2;
+      --sw-accent: #7c5cfc;
+      --bg: #06070b;
+      --ink: #ffffff;
+      --ink-soft: #a7afc2;
+      --violet: #7c5cfc;
+      --line: rgba(244,246,250,.08);
+      /* Bold, impactful display font for headings — Bebas Neue delivers
+         the heavy, condensed, all-caps aesthetic from your reference design */
+      --font-display: "Bebas Neue", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    html, body { background: #06070b; }
+  </style>
+</head>
+<body>
+  <div id="top"></div>
+  <div id="world"></div>
+
+  <script src="scrub-engine.js"></script>
+  <script>
+    mountScrollWorld(document.getElementById('world'), {
+      brand: { name: 'Techpotam', href: '#top' },
+      cta: { label: 'Book a call', href: 'mailto:hello@techpotam.com' },
+      diveScroll: 1.3,
+      connScroll: 0.9,
+      sections: [
+        {
+          id: 'product', label: 'The Product',
+          still: 'assets/product.jpg',
+          clip: 'assets/vid/product.mp4',
+          clipMobile: 'assets/vid/product-m.mp4',
+          accent: '#7c5cfc',
+          scroll: 2.2, linger: 0.4,
+          eyebrow: 'Product Engineering',
+          title: 'We build software that just works.',
+          body: 'From first commit to a live product in your users’ hands. Clean architecture, fast iteration, dependable delivery.',
+          tags: ['Web & Mobile', 'Cloud-native', 'UK-based team'],
+        },
+        {
+          id: 'process', label: 'How We Work',
+          still: 'assets/process.jpg',
+          clip: 'assets/vid/process.mp4',
+          clipMobile: 'assets/vid/process-m.mp4',
+          accent: '#7c5cfc',
+          scroll: 2.0, linger: 0.35,
+          eyebrow: 'How We Work',
+          title: 'Every build starts with a plan.',
+          body: 'We map the system before we write a line of code, so what ships matches exactly what you asked for.',
+          tags: ['Discovery', 'Design', 'Delivery'],
+        },
+        {
+          id: 'precision', label: 'Precision Engineering',
+          still: 'assets/precision.jpg',
+          clip: 'assets/vid/precision.mp4',
+          clipMobile: 'assets/vid/precision-m.mp4',
+          accent: '#7c5cfc',
+          scroll: 2.0, linger: 0.35,
+          eyebrow: 'Precision Engineering',
+          title: 'Every detail, considered.',
+          body: 'From the first keystroke to the silicon it runs on, nothing ships until it’s right.',
+          tags: ['Code review', 'Performance budget', 'Security-first'],
+        },
+        {
+          id: 'team', label: 'One Team',
+          still: 'assets/team.jpg',
+          clip: 'assets/vid/team.mp4',
+          clipMobile: 'assets/vid/team-m.mp4',
+          accent: '#7c5cfc',
+          scroll: 2.4, linger: 0.4,
+          eyebrow: 'One Team',
+          title: 'Not a vendor. A team that sits with you.',
+          body: 'You’ll talk to the people writing the code, not an account manager relaying messages. From kickoff to the day it ships.',
+          tags: ['Weekly demos', 'Direct Slack access', 'Decisions made with you'],
+          cta: {
+            primary: { label: 'Book a call', href: 'mailto:hello@techpotam.com' },
+            secondary: { label: 'Our approach', href: '#process-section' },
+          },
+        },
+      ],
+      // These four clips are independent renders, not frame-locked dive/
+      // connector pairs from the same world (see SKILL.md Step 5), so
+      // there's no seamless aerial connector between them. Null at each
+      // seam lets the engine crossfade directly instead of a hard cut.
+      connectors: [null, null, null],
+    });
+  </script>
+
+  <main class="site">
+    <!-- What We Do -->
+    <section class="site__section services" id="services">
+      <div class="services__head">
+        <span class="site__eyebrow" style="--accent:var(--violet)">What We Do</span>
+        <h2 class="site__title">Software, built end to end.</h2>
+        <p class="site__body">From the first architecture decision to the infrastructure it runs on, one team, no handoffs.</p>
+      </div>
+      <div class="services__grid" data-reveal="stagger">
+        <article class="card card--ai" style="--card-accent:var(--violet)">
+          <img class="card__img" src="assets/card-ai.jpg" alt="" loading="lazy" />
+          <div class="card__content">
+            <span class="card__badge">AI-native</span>
+            <h3 class="card__title">AI Integration &amp; Automation</h3>
+            <p class="card__desc">LLM-powered features and workflow automation, built into your product from day one.</p>
+          </div>
+        </article>
+        <article class="card card--product" style="--card-accent:var(--violet)">
+          <img class="card__img" src="assets/card-product.jpg" alt="" loading="lazy" />
+          <div class="card__content">
+            <h3 class="card__title">Product Engineering</h3>
+            <p class="card__desc">Web and mobile products built to scale with you, not against you.</p>
+          </div>
+        </article>
+        <article class="card card--cloud" style="--card-accent:var(--violet)">
+          <img class="card__img" src="assets/card-cloud.jpg" alt="" loading="lazy" />
+          <div class="card__content">
+            <h3 class="card__title">Cloud &amp; Infrastructure</h3>
+            <p class="card__desc">Cloud-native deployments, monitored and hardened from day one.</p>
+          </div>
+        </article>
+        <article class="card card--design" style="--card-accent:var(--violet)">
+          <img class="card__img" src="assets/card-design.jpg" alt="" loading="lazy" />
+          <div class="card__content">
+            <h3 class="card__title">Product &amp; UI/UX Design</h3>
+            <p class="card__desc">Interfaces people actually want to use, shipped fast.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Industries -->
+    <section class="site__section industries">
+      <div class="industries__glow" aria-hidden="true"></div>
+      <div class="industries__head" data-reveal>
+        <h2 class="site__title" style="max-width:16ch">Built for regulated, fast-moving industries.</h2>
+        <p class="site__body">Different sectors bring different constraints. We’ve shipped through most of them.</p>
+      </div>
+      <div class="industries__marquee" data-reveal>
+        <div class="industries__row industries__row--a">
+          <div class="industries__track">
+            <ul class="industries__pills">
+              <li>Fintech</li>
+              <li>Healthtech</li>
+              <li>Edtech</li>
+              <li>E-commerce</li>
+            </ul>
+            <ul class="industries__pills" aria-hidden="true">
+              <li>Fintech</li>
+              <li>Healthtech</li>
+              <li>Edtech</li>
+              <li>E-commerce</li>
+            </ul>
+          </div>
+        </div>
+        <div class="industries__row industries__row--b">
+          <div class="industries__track">
+            <ul class="industries__pills">
+              <li>Manufacturing</li>
+              <li>Media &amp; Entertainment</li>
+              <li>On-Demand Platforms</li>
+            </ul>
+            <ul class="industries__pills" aria-hidden="true">
+              <li>Manufacturing</li>
+              <li>Media &amp; Entertainment</li>
+              <li>On-Demand Platforms</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Infrastructure / reliability. Its own scroll-scrubbed scene, same
+         mechanic as the hero, mounted independently further down the page. -->
+    <div id="infra-world"></div>
+    <script>
+      mountScrollWorld(document.getElementById('infra-world'), {
+        nav: false,
+        atmosphere: false,
+        sections: [
+          {
+            id: 'infra', label: 'Reliability',
+            still: 'assets/infra-scene.jpg',
+            clip: 'assets/vid/infra.mp4',
+            clipMobile: 'assets/vid/infra-m.mp4',
+            accent: '#7c5cfc',
+            scroll: 2.2, linger: 0.4,
+            eyebrow: 'Reliability',
+            title: 'Enterprise-grade infrastructure. Every time.',
+            body: 'Every build is engineered for uptime, monitored continuously, and hardened before it ever reaches production.',
+            tags: ['Cloud-native', 'Monitored 24/7', 'Security reviewed'],
+          },
+        ],
+      });
+    </script>
+
+    <!-- Process. GSAP sticky-stack: each step pins and settles as the next
+         arrives, a real scroll-driven sequence rather than a static list,
+         since the brief specifically asked for a cinematic scroll feel
+         beyond the video hero. -->
+    <section class="site__section process" id="process-section">
+      <div class="process__head" data-reveal>
+        <h2 class="site__title" style="max-width:14ch">How a build actually happens.</h2>
+        <p class="site__body">Four stages, the same team the whole way through.</p>
+      </div>
+      <div class="process__stack">
+        <div class="process__card" style="--card-accent:var(--violet)">
+          <div class="process__card__inner">
+            <div class="process__text">
+              <span class="process__ghost-num">01</span>
+              <h3 class="process__title">Discover</h3>
+              <p class="process__desc">We sit with your team, map the real problem, and scope what’s actually worth building first.</p>
+            </div>
+            <div class="process__visual">
+              <!-- TODO: swap in the provided step image as
+                   <img class="process__visual-img" src="assets/process-01.jpg" alt="" />
+                   the shapes below are the CSS/SVG fallback (no-WebGL,
+                   reduced-motion) for the Three.js glass sphere. -->
+              <canvas class="process__canvas" data-shape="sphere" aria-hidden="true"></canvas>
+              <div class="process__rays"></div>
+              <div class="process__glow"></div>
+              <div class="process__orb"></div>
+            </div>
+          </div>
+        </div>
+        <div class="process__card" style="--card-accent:var(--violet)">
+          <div class="process__card__inner">
+            <div class="process__text">
+              <span class="process__ghost-num">02</span>
+              <h3 class="process__title">Design</h3>
+              <p class="process__desc">Architecture and interface decided together, so the product is fast to build and easy to use.</p>
+            </div>
+            <div class="process__visual">
+              <!-- TODO: assets/process-02.jpg -->
+              <canvas class="process__canvas" data-shape="torusknot" aria-hidden="true"></canvas>
+              <div class="process__rays"></div>
+              <div class="process__glow"></div>
+              <svg class="process__rings" viewBox="0 0 220 220" fill="none">
+                <defs>
+                  <linearGradient id="ringGradA" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#8fd8ff" stop-opacity=".95"/>
+                    <stop offset="100%" stop-color="#7c5cfc" stop-opacity=".9"/>
+                  </linearGradient>
+                  <linearGradient id="ringGradB" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#7c5cfc" stop-opacity=".95"/>
+                    <stop offset="100%" stop-color="#c9b6ff" stop-opacity=".85"/>
+                  </linearGradient>
+                </defs>
+                <ellipse cx="110" cy="110" rx="82" ry="40" transform="rotate(15 110 110)" stroke="url(#ringGradA)" stroke-width="7"/>
+                <ellipse cx="110" cy="110" rx="82" ry="40" transform="rotate(75 110 110)" stroke="url(#ringGradB)" stroke-width="7"/>
+                <ellipse cx="110" cy="110" rx="82" ry="40" transform="rotate(135 110 110)" stroke="url(#ringGradA)" stroke-width="7" opacity=".85"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="process__card" style="--card-accent:var(--violet)">
+          <div class="process__card__inner">
+            <div class="process__text">
+              <span class="process__ghost-num">03</span>
+              <h3 class="process__title">Build</h3>
+              <p class="process__desc">Short iterations, weekly demos, code you can see landing in a live environment as it’s written.</p>
+            </div>
+            <div class="process__visual">
+              <!-- TODO: assets/process-03.jpg -->
+              <canvas class="process__canvas" data-shape="cubes" aria-hidden="true"></canvas>
+              <div class="process__rays"></div>
+              <div class="process__glow"></div>
+              <svg class="process__cubes" viewBox="0 0 240 220" fill="none">
+                <defs>
+                  <linearGradient id="cubeTop" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#c9b6ff" stop-opacity=".95"/>
+                    <stop offset="100%" stop-color="#8fd8ff" stop-opacity=".85"/>
+                  </linearGradient>
+                  <linearGradient id="cubeLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#7c5cfc" stop-opacity=".8"/>
+                    <stop offset="100%" stop-color="#4b3a99" stop-opacity=".7"/>
+                  </linearGradient>
+                  <linearGradient id="cubeRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#9d84ff" stop-opacity=".85"/>
+                    <stop offset="100%" stop-color="#5d46c4" stop-opacity=".75"/>
+                  </linearGradient>
+                </defs>
+                <!-- three isometric cubes, each: top / left / right rhombus faces.
+                     Positioning transform stays on the outer <g>; the float
+                     animation (site.css) targets the inner <g> only, so it
+                     can't overwrite each cube's translate(x y) placement. -->
+                <g transform="translate(120 60)">
+                  <g>
+                    <polygon points="0,0 40,-23 80,0 40,23" fill="url(#cubeTop)"/>
+                    <polygon points="0,0 40,23 40,63 0,40" fill="url(#cubeLeft)"/>
+                    <polygon points="80,0 40,23 40,63 80,40" fill="url(#cubeRight)"/>
+                  </g>
+                </g>
+                <g transform="translate(40 100)">
+                  <g>
+                    <polygon points="0,0 40,-23 80,0 40,23" fill="url(#cubeTop)"/>
+                    <polygon points="0,0 40,23 40,63 0,40" fill="url(#cubeLeft)"/>
+                    <polygon points="80,0 40,23 40,63 80,40" fill="url(#cubeRight)"/>
+                  </g>
+                </g>
+                <g transform="translate(120 140)">
+                  <g>
+                    <polygon points="0,0 40,-23 80,0 40,23" fill="url(#cubeTop)"/>
+                    <polygon points="0,0 40,23 40,63 0,40" fill="url(#cubeLeft)"/>
+                    <polygon points="80,0 40,23 40,63 80,40" fill="url(#cubeRight)"/>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="process__card" style="--card-accent:var(--violet)">
+          <div class="process__card__inner">
+            <div class="process__text">
+              <span class="process__ghost-num">04</span>
+              <h3 class="process__title">Ship &amp; support</h3>
+              <p class="process__desc">Launch is the start, not the finish line. We stay on for monitoring, fixes, and what comes next.</p>
+            </div>
+            <div class="process__visual">
+              <!-- TODO: assets/process-04.jpg -->
+              <canvas class="process__canvas" data-shape="dome" aria-hidden="true"></canvas>
+              <div class="process__rays"></div>
+              <div class="process__glow"></div>
+              <div class="process__dome-wrap">
+                <div class="process__dome-ring"></div>
+                <div class="process__dome-ring"></div>
+                <div class="process__dome-ring"></div>
+                <div class="process__dome"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Engagement models -->
+    <section class="site__section engagement" id="engagement">
+      <div class="engagement__head" data-reveal>
+        <h2 class="site__title" style="max-width:14ch">Two ways to work with us.</h2>
+      </div>
+      <div class="engagement__grid">
+        <article class="engagement__card" data-reveal>
+          <h3 class="engagement__title">Dedicated Team</h3>
+          <p class="engagement__desc">Embed our engineers directly into your existing team and roadmap. You direct the work day to day, we bring the hands.</p>
+          <ul class="engagement__list">
+            <li>Best when you already have a product and a plan</li>
+            <li>Scale up or down as the roadmap shifts</li>
+            <li>Billed monthly per engineer</li>
+          </ul>
+        </article>
+        <article class="engagement__card" data-reveal>
+          <h3 class="engagement__title">Full-Service Build</h3>
+          <p class="engagement__desc">Hand us the problem. We staff, design, build, and ship the whole product, with you reviewing at every milestone.</p>
+          <ul class="engagement__list">
+            <li>Best when you’re starting from an idea or a brief</li>
+            <li>One team accountable for the whole outcome</li>
+            <li>Fixed-scope or milestone-based pricing</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Global delivery -->
+    <section class="site__section feature feature--global">
+      <div class="feature__bg"></div>
+      <div class="feature__glow"></div>
+      <div class="feature__inner" data-reveal>
+        <h2 class="site__title" style="max-width:14ch">UK-based team. Built without borders.</h2>
+        <p class="site__body">We work directly with teams across the UK and beyond. Same time zone when it matters, async when it doesn’t.</p>
+        <ul class="feature__points" style="--accent:var(--violet)">
+          <li>UK-based delivery, global engineering bench</li>
+          <li>Direct access to the team building your product</li>
+          <li>Clear timelines, no offshore black box</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="site__section cta" id="contact">
+      <div class="cta__bg"></div>
+      <div data-reveal>
+        <h2 class="cta__title">Let’s build something exceptional.</h2>
+        <p class="site__body">Tell us what you’re trying to ship. We’ll tell you how we’d build it.</p>
+        <div class="cta__actions">
+          <a class="btn btn--primary" href="mailto:hello@techpotam.com">Book a call</a>
+          <a class="btn btn--ghost" href="mailto:hello@techpotam.com">hello@techpotam.com</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site__footer">
+      <span>© 2026 Techpotam Pvt Ltd</span>
+      <a href="mailto:hello@techpotam.com">hello@techpotam.com</a>
+    </footer>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="site.js"></script>
+  <!-- Three.js: vanilla ES modules via CDN, no build step (same constraint
+       as the rest of the site). Powers the Process section's 4 glass 3D
+       shapes; process-3d.js no-ops (leaving the CSS/SVG shapes visible) on
+       no-WebGL or prefers-reduced-motion, so the import map + module script
+       cost nothing when it can't run. -->
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="process-3d.js"></script>
+</body>
+</html>
