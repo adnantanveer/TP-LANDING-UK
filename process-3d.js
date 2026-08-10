@@ -48,39 +48,15 @@
       envRenderer.dispose();
     }
 
-    var instances = canvases.map(function (canvas) {
-      return createInstance(canvas);
-    }).filter(Boolean);
-
-    if (!instances.length) return;
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var inst = entry.target.__process3d;
-        if (inst) inst.active = entry.isIntersecting;
-      });
-    }, { threshold: 0.05 });
-    instances.forEach(function (inst) { io.observe(inst.canvas.closest('.process__card')); });
-
-    var ro = new ResizeObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var inst = entry.target.__process3d;
-        if (inst) inst.resize();
-      });
-    });
-    instances.forEach(function (inst) { ro.observe(inst.canvas); inst.resize(); });
-
-    var clock = new THREE.Clock();
-    function tick() {
-      var t = clock.getElapsedTime();
-      instances.forEach(function (inst) {
-        if (!inst.active) return;
-        inst.animate(t);
-        inst.renderer.render(inst.scene, inst.camera);
-      });
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
+    // BUG FIX: instance creation used to run right here, before `var SHAPES
+    // = {...}` further down. createInstance() reads SHAPES[shape]
+    // synchronously, but `var` hoisting only hoists the declaration, not
+    // the assignment — so SHAPES was still `undefined` at this point and
+    // every call threw "Cannot read properties of undefined (reading
+    // 'sphere')", uncaught, aborting boot() entirely. Net effect: none of
+    // the Process section's 4 shapes ever actually rendered, always
+    // silently sitting on the CSS/SVG fallback. Moved below SHAPES/
+    // createInstance/glassMaterial; nothing else here changed.
 
     function createInstance(canvas) {
       var shape = canvas.dataset.shape;
@@ -230,5 +206,39 @@
         return group;
       },
     };
+
+    var instances = canvases.map(function (canvas) {
+      return createInstance(canvas);
+    }).filter(Boolean);
+
+    if (!instances.length) return;
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var inst = entry.target.__process3d;
+        if (inst) inst.active = entry.isIntersecting;
+      });
+    }, { threshold: 0.05 });
+    instances.forEach(function (inst) { io.observe(inst.canvas.closest('.process__card')); });
+
+    var ro = new ResizeObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var inst = entry.target.__process3d;
+        if (inst) inst.resize();
+      });
+    });
+    instances.forEach(function (inst) { ro.observe(inst.canvas); inst.resize(); });
+
+    var clock = new THREE.Clock();
+    function tick() {
+      var t = clock.getElapsedTime();
+      instances.forEach(function (inst) {
+        if (!inst.active) return;
+        inst.animate(t);
+        inst.renderer.render(inst.scene, inst.camera);
+      });
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   }
 })();

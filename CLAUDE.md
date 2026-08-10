@@ -64,13 +64,19 @@ then open `http://localhost:8934/index.html`.
    fallback, shown until (or unless) the canvas renders — `site.css`
    `.process__visual.has-3d` toggles which one is visible.
 
-The four reference images the user pasted (glass sphere, glass torus knot,
-glass cube cluster, glass dome with ripples) are the target look — the
-Three.js rebuild exists specifically to get closer to that than flat CSS
-could. **Not yet QA'd in a browser** — next session should load the page,
-scroll to Process, and visually confirm all 4 shapes render, rotate/float
-correctly, and that the fallback still works with `prefers-reduced-motion`
-or WebGL disabled.
+**The Three.js shapes are QA'd and working correctly, but intentionally
+disabled** — `process-3d.js`'s `<script>` tag is commented out in
+`index.html`. Backstory: a `var`-hoisting ordering bug in `process-3d.js`
+(instances were created before `SHAPES` was assigned, so `SHAPES[shape]`
+was always `undefined`) meant the canvases threw on every load and the
+CSS/SVG fallback was all that had ever actually rendered, unnoticed,
+through multiple earlier sessions — the four reference images this was
+built to match were never actually seen live. Once the ordering bug was
+fixed and the real 3D shapes rendered for the first time, the user reviewed
+them live and preferred the CSS/SVG fallback look, so 3D was switched back
+off deliberately (not by the bug this time). Don't re-enable by
+uncommenting that script tag without checking first — the CSS/SVG shapes
+are the current intended look for this section.
 
 ## Fixed bugs worth knowing about (don't re-break these)
 

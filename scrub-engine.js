@@ -265,7 +265,25 @@ function mountScrollWorld(container, config) {
       // hero, so this doesn't change that case.
       if (i === 0) cop = (before || after) ? 0 : smooth(1 - pr / 0.62);
       else if (i === N - 1) cop = before ? 0 : smooth(pr / 0.4);       // holds CTA at the end
-      else cop = (before || after) ? 0 : smooth(1 - Math.abs(pr - 0.5) / 0.5);
+      else {
+        // BUG FIX: this used to be smooth(1 - Math.abs(pr - 0.5) / 0.5) — a
+        // fade tied to `pr`, the fraction of this WHOLE dive's scroll length
+        // (often ~2 viewport-heights per section.scroll), so copy took ~1vh
+        // of scroll to reach full opacity. The video crossfades in over a
+        // fixed, much shorter CROSSFADE*vh window (~0.1vh) via a completely
+        // separate mechanism (the SEGMENTS opacity loop above) — so for a
+        // wide band right after the dot switches and the video is already
+        // fully visible, the copy was still sitting at ~0 opacity: dot lit,
+        // scene playing, no text. Measured via Playwright (DOM opacity swept
+        // across the scroll range): copy stayed under 0.1 for ~150px and
+        // under 0.5 for over 400px after the video hit full opacity.
+        // Rewritten to fade over a fixed pixel window instead of a fraction
+        // of the dive's own length, so it tracks the video's own pace
+        // regardless of how long/short that section's dive is configured.
+        const distIn = y - seg.start, distOut = seg.end - y;
+        const fadeWindow = Math.min(0.5 * vh, (seg.end - seg.start) / 2);
+        cop = (before || after) ? 0 : smooth(Math.min(distIn, distOut) / fadeWindow);
+      }
       const c = copies[i];
       c.style.opacity = cop;
       // PATCH (multi-line-copy overflow): this inline transform is set every

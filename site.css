@@ -88,6 +88,15 @@
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, transparent), color-mix(in srgb, var(--bg) 55%, transparent));
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  transition: transform .4s cubic-bezier(.16,.8,.3,1);
+}
+/* Scroll-direction show/hide (site.js): slides fully off-screen on the way
+   down past a small threshold, past the top edge so its own drop shadow
+   doesn't linger as a stray line, and back in on the way up or near the
+   very top of the page. */
+.sw-topbar.nav-hidden { transform: translateY(-110%); }
+@media (prefers-reduced-motion: reduce) {
+  .sw-topbar { transition: none; }
 }
 
 /* The engine's default nav container is a near-white pill (55% white,
@@ -326,6 +335,28 @@
   display: none !important;
 }
 
+/* The embedded Infrastructure instance's video is a bright, mostly-white
+   dashboard close-up; scrub-engine.js pads its scroll track with an extra
+   viewport-height of "runway" past the scene's own end (layout(): "the last
+   flight completes") during which the video has already faded to fully
+   transparent — .sw-stage has no background of its own, so that runway was
+   a dead gap showing straight through to .site's plain #06070b base: video
+   (bright) cuts directly to flat black, then Process's heading pops in.
+   .sw-track is the one non-fixed layer in this instance (it scrolls
+   normally, doesn't cover anything above/below like the fixed .sw-stage/
+   .sw-sky would if given a background) so it's the safe place to fill that
+   gap — transparent while the video's still playing over it, then eases to
+   the same violet-black tone Process opens on (its own ::before below),
+   so the two agree by the time Process actually arrives. Scoped to this
+   instance only; the hero's own .sw-track isn't part of what was reported
+   broken. */
+#infra-world .sw-track {
+  background: linear-gradient(to bottom,
+    transparent 0%, transparent 58%,
+    color-mix(in srgb, var(--violet) 8%, #06070b) 84%,
+    color-mix(in srgb, var(--violet) 14%, #06070b) 100%);
+}
+
 .site__section {
       background: #0b0d14;
   position: relative;
@@ -346,7 +377,8 @@
    with the page exactly like everything else in it. Whichever section
    follows a video scene gets one, tinted toward that scene's last accent. */
 .services::before,
-.feature--global::before {
+.feature--global::before,
+.process::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
@@ -371,6 +403,18 @@
 .feature--global::before {
   background: radial-gradient(55% 90% at 88% 0%, color-mix(in srgb, var(--violet) 14%, transparent), transparent 70%);
 }
+/* Same handoff, different sender: this bridges the embedded Infrastructure
+   instance's runway (the "Enterprise-grade infrastructure" scene) into
+   Process, which never got this treatment — the only scroll-world exit on
+   the page left without one, and the reported "sudden black screen" before
+   Process arrives is exactly that missing bridge: the instance's video
+   fades out, .sw-sky is force-hidden on embedded instances (site.css
+   .sw-embedded), and nothing filled that gap until this section's own
+   background scrolled up to meet it. */
+.process::before {
+  background: radial-gradient(55% 90% at 12% 0%, color-mix(in srgb, var(--violet) 16%, transparent), transparent 70%);
+}
+.process__head, .process__stack { position: relative; z-index: 1; }
 .services__head, .services__grid { position: relative; z-index: 1; }
 /* Forces the heading onto its own GPU compositing layer, isolated from
    whatever's stacked behind it. This is the actual fix for the text
@@ -435,6 +479,15 @@
   [data-reveal], [data-reveal="stagger"] > * { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 
+/* Word-by-word reveal for the big section headings (site.js), each word
+   masked in its own inline-block so it can rise into view individually
+   instead of the whole line/block fading as one flat unit. GSAP animates
+   .reveal-word-inner's transform/opacity per word; this just owns the
+   mask + the pre-JS/no-JS fallback (plain, fully visible text) so a
+   failed script load never hides a heading. */
+.reveal-word-mask { display: inline-block; overflow: hidden; line-height: inherit; vertical-align: bottom; }
+.reveal-word-inner { display: inline-block; line-height: inherit; will-change: transform, opacity; }
+
 /* ---- Services (asymmetric bento, not the banned 3-equal-card row) ----
    4 items, 4 cells, no empty gaps: one tall hero cell (AI, the most
    forward-looking offering) plus two small top cells and one wide bottom
@@ -463,12 +516,29 @@
   background: #0b0d14;
   border: 1px solid var(--line);
   isolation: isolate;
-  /* Base scale/lift comes from JS (site.js scroll-focus sweep, --card-bright
-     + inline transform); transition here is what makes that change smooth
-     frame-to-frame rather than snapping. */
-  transition: transform .5s cubic-bezier(.16,.8,.3,1), border-color .3s, box-shadow .3s;
   transform-origin: center 65%;
 }
+/* `.services__grid .card` (2 classes) rather than `.card` (1 class): the
+   grid's own [data-reveal="stagger"].is-visible > * rule (site.css, used
+   for its scroll-entrance) also sets `transform` on these same elements —
+   same specificity as a bare `.card` would give this rule, so the reveal
+   rule (defined earlier but that doesn't matter once specificity ties are
+   broken by matching it) was winning and clobbering the scale/tilt
+   transform back to flat translateY(0) on every card. Bumping to 2 classes
+   here beats it outright.
+   Scale comes from JS (site.js scroll-focus sweep, --card-scale) and the
+   cursor-tilt below (--card-rx/--card-ry) as separate custom properties
+   composed into one transform, rather than either script writing the
+   `transform` shorthand directly and clobbering the other's value — same
+   "compose, don't replace" fix as the hero copy transform bug. The .5s
+   ease is tuned for the scroll-driven scale; .is-tilting (JS, on pointer
+   enter/leave) swaps in a snappier transition just for the cursor-follow
+   duration so the tilt doesn't feel laggy. */
+.services__grid .card {
+  transform: scale(var(--card-scale, 1)) perspective(900px) rotateX(var(--card-rx, 0deg)) rotateY(var(--card-ry, 0deg));
+  transition: transform .5s cubic-bezier(.16,.8,.3,1), border-color .3s, box-shadow .3s;
+}
+.services__grid .card.is-tilting { transition: transform .12s ease-out, border-color .3s, box-shadow .3s; }
 .card:hover {
   border-color: color-mix(in srgb, var(--card-accent) 55%, var(--line));
   box-shadow: 0 12px 40px color-mix(in srgb, var(--card-accent) 22%, transparent);
@@ -862,58 +932,56 @@
 /* ---- Engagement models: plain 2-column comparison. Deliberately not a
    3-card row or another bento (Section-Layout-Repetition Ban), and not a
    pricing table, just two clear paths. ---- */
-.engagement__head { max-width: 640px; margin-bottom: clamp(32px, 5vw, 56px); }
-.engagement__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.engagement__card {
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: clamp(28px, 3.5vw, 40px);
-  background: color-mix(in srgb, var(--ink) 3%, transparent);
-}
-/* ---- Engagement models (Dedicated Team / Full-Service Build) ---- */
-.engagement {
-  position: relative;
-  background-image: url('assets/bg2.jpg');
-  background-size: cover;
-  background-position: center;
-}
-.engagement::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(10, 14, 26, 0.3);
-  z-index: 0;
-}
-.engagement__head {
-  position: relative;
-  z-index: 1;
-}
-.engagement__head .site__title {
-  color: #ffffff;
-}
+/* ---- Engagement models (Dedicated Team / Full-Service Build) ----
+   This whole block used to be two conflicting definitions layered on top
+   of each other — an earlier, on-brand version plus a later, stale one
+   still pointing at a non-existent assets/bg2.jpg and, worse, hardcoding
+   #a855f7 (purple) and #06b6d4 (cyan) as a second and third accent color,
+   both direct violations of the single-accent-violet rule (CLAUDE.md).
+   The later rules won the cascade, so that's what was actually shipping.
+   Consolidated into one definition, single violet accent throughout. */
+.engagement { position: relative; }
+.engagement__head { position: relative; z-index: 1; max-width: 640px; margin-bottom: clamp(32px, 5vw, 56px); }
 .engagement__grid {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-top: 48px;
+  gap: 24px;
 }
 @media (max-width: 768px) {
-  .engagement__grid {
-    grid-template-columns: 1fr;
-  }
+  .engagement__grid { grid-template-columns: 1fr; }
 }
 .engagement__card {
-  padding: 40px;
-  border: 2px solid #a855f7;
-  border-radius: 8px;
-  background: transparent;
-  backdrop-filter: none;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: clamp(28px, 3.5vw, 40px);
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: border-color .3s, background .3s;
 }
-.engagement__card:nth-child(2) {
-  border-color: #06b6d4;
+/* Accent-line hover: a hairline violet bar draws in from the left along
+   the card's top edge (scaleX, not width, so it's compositor-only) rather
+   than the whole card changing color — a quieter "this is interactive"
+   cue that doesn't fight the card's own glass treatment. */
+.engagement__card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--violet);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .5s cubic-bezier(.16,.8,.3,1);
 }
+.engagement__card:hover {
+  border-color: color-mix(in srgb, var(--violet) 40%, var(--line));
+  background: color-mix(in srgb, var(--violet) 6%, transparent);
+}
+.engagement__card:hover::before { transform: scaleX(1); }
 .engagement__title {
   font-family: var(--font-display);
   font-weight: 400;
@@ -921,12 +989,12 @@
   margin: 0 0 14px;
   text-transform: uppercase;
   letter-spacing: -.01em;
-  color: #ffffff;
+  color: var(--ink);
 }
 .engagement__desc {
   font-size: 1rem;
   line-height: 1.6;
-  color: #e5e5e5;
+  color: var(--ink-soft);
   margin: 0 0 24px;
 }
 .engagement__list {
@@ -936,12 +1004,12 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-top: 1px solid rgba(168, 85, 247, 0.3);
+  border-top: 1px solid var(--line);
   padding-top: 20px;
 }
 .engagement__list li {
   font-size: .94rem;
-  color: #d4d4d8;
+  color: var(--ink-soft);
   padding-left: 18px;
   position: relative;
 }
@@ -953,7 +1021,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #a855f7;
+  background: var(--violet);
 }
 
 /* ---- final CTA / footer ---- */
@@ -1011,6 +1079,126 @@
 .site__footer a { color: var(--ink-soft); text-decoration: none; }
 .site__footer a:hover { color: var(--ink); }
 
+/* ---- Testimonials: a pinned quote stage that crossfades between quotes
+   as you scroll (site.js, GSAP ScrollTrigger scrub), with a huge
+   quotation-mark glyph behind it drifting at its own parallax rate. Not a
+   card grid — that would repeat the Services/Engagement layout family a
+   third time, and a single spotlight quote reads better for short pull-
+   quotes anyway. This one mechanism covers both the "smooth transition"
+   and "parallax on scroll" brief instead of needing two separate ones.
+   Degrades safely with no JS/reduced-motion: only the first
+   .testimonials__quote carries `is-active` in the HTML, so it just shows
+   statically instead of an empty section. */
+/* Section-level tint so this reads as its own distinct zone instead of
+   blending straight into the flat #0b0d14 that Engagement/Process also
+   use — the section was disappearing between its neighbors with nothing
+   marking where it started/ended. */
+.testimonials {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0b0d14, color-mix(in srgb, var(--violet) 7%, #0b0d14) 45%, #0b0d14);
+}
+.testimonials__head { position: relative; z-index: 1; max-width: 640px; margin: 0 auto clamp(28px, 4vw, 48px); text-align: center; }
+.testimonials__stage {
+  position: relative;
+  min-height: 46vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+.testimonials__glyph {
+  position: absolute;
+  top: -14%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(9rem, 18vw, 14rem);
+  line-height: 1;
+  color: color-mix(in srgb, var(--violet) 20%, transparent);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  will-change: transform;
+}
+.testimonials__track {
+  position: relative;
+  z-index: 1;
+  width: min(90vw, 720px);
+  min-height: 300px;
+}
+.testimonials__quote {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+  padding: clamp(36px, 5vw, 56px) clamp(28px, 5vw, 48px);
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .3), inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent);
+  opacity: 0;
+  /* Exit (no .is-active, this rule) is quick and starts immediately; entry
+     (.is-active, below) is slower but delayed — staggering the two instead
+     of a straight simultaneous crossfade keeps outgoing/incoming text from
+     both sitting at high opacity at once, which read as ghosted, doubled-up
+     text overlapping mid-transition. */
+  transition: opacity .35s ease;
+}
+.testimonials__quote.is-active { opacity: 1; transition: opacity .5s ease .22s; }
+.testimonials__quote p {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+  line-height: 1.5;
+  letter-spacing: -.005em;
+  color: var(--ink);
+  margin: 0;
+}
+.testimonials__quote footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.testimonials__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+.testimonials__who { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+.testimonials__who cite { font-style: normal; font-weight: 600; font-size: .94rem; color: var(--ink); }
+.testimonials__who span { font-size: .84rem; color: var(--ink-soft); }
+.testimonials__dots {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+}
+.testimonials__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--ink) 20%, transparent);
+  cursor: pointer;
+  transition: background .3s, transform .3s;
+}
+.testimonials__dot.is-active {
+  background: var(--violet);
+  transform: scale(1.3);
+}
+
 @media (max-width: 860px) {
   .services__grid { grid-template-columns: 1fr; grid-template-rows: none; }
   .card--ai, .card--product, .card--cloud, .card--design { grid-column: 1; grid-row: auto; }
@@ -1020,4 +1208,8 @@
   .cta { min-height: auto; padding-block: 96px; }
   .engagement__grid { grid-template-columns: 1fr; }
   .process__card { min-height: auto; padding: 28px; }
+  .testimonials__stage { min-height: 60vh; gap: 28px; }
+  .testimonials__glyph { font-size: 42vw; top: -3%; }
+  .testimonials__quote footer { flex-direction: column; gap: 8px; }
+  .testimonials__who { align-items: center; text-align: center; }
 }

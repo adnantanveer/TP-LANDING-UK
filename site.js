@@ -205,7 +205,7 @@
       var d = clamp(1 - Math.abs(i - focus), 0, 1);
       var scale = 1 + d * 0.07;
       var bright = 0.72 + d * 0.28;
-      card.style.transform = 'scale(' + scale.toFixed(3) + ')';
+      card.style.setProperty('--card-scale', scale.toFixed(3));
       card.style.setProperty('--card-bright', bright.toFixed(3));
     });
   }
@@ -214,6 +214,40 @@
   }, { passive: true });
   window.addEventListener('resize', update);
   update();
+})();
+
+/* Services cards: a subtle cursor-tilt (perspective rotateX/rotateY toward
+   the pointer) layered on top of the scroll-focus sweep above — writes to
+   its own --card-rx/--card-ry custom properties (site.css composes them
+   with --card-scale into one transform), so the two scripts never fight
+   over the same `transform` value. Desktop-with-a-real-pointer only
+   (matchMedia hover:hover/pointer:fine): touch has no hover to tilt
+   toward, and there's nothing to clean up if this guard skips it. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (reduce || !canHover) return;
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.services__grid .card'));
+  if (!cards.length) return;
+
+  var MAX_DEG = 6;
+  cards.forEach(function (card) {
+    card.addEventListener('pointerenter', function () {
+      card.classList.add('is-tilting');
+    });
+    card.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty('--card-ry', (px * MAX_DEG * 2).toFixed(2) + 'deg');
+      card.style.setProperty('--card-rx', (-py * MAX_DEG * 2).toFixed(2) + 'deg');
+    });
+    card.addEventListener('pointerleave', function () {
+      card.classList.remove('is-tilting');
+      card.style.setProperty('--card-rx', '0deg');
+      card.style.setProperty('--card-ry', '0deg');
+    });
+  });
 })();
 
 /* Process section: GSAP ScrollTrigger sticky-stack, the canonical pattern
@@ -277,5 +311,153 @@
         scrub: true,
       },
     });
+  });
+})();
+
+/* Section headings: each word rises into view individually (masked
+   inline-block per word, GSAP animates the inner span) instead of the
+   whole heading fading as one flat block — the one place on the page
+   where the big display type gets its own entrance rather than inheriting
+   the generic [data-reveal] fade its wrapping section head uses. Plain,
+   fully-visible text is the HTML default, so a failed GSAP/ScrollTrigger
+   load or prefers-reduced-motion just leaves normal static text — nothing
+   here can end up permanently hidden. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || typeof gsap === 'undefined') return;
+  var hasST = typeof ScrollTrigger !== 'undefined';
+  if (hasST) gsap.registerPlugin(ScrollTrigger);
+
+  var titles = Array.prototype.slice.call(document.querySelectorAll('.site__title, .cta__title'));
+  titles.forEach(function (title) {
+    var words = title.textContent.split(/\s+/).filter(Boolean);
+    if (words.length < 2) return; // nothing meaningful to stagger
+    title.innerHTML = words.map(function (w, i) {
+      var text = w + (i < words.length - 1 ? '&nbsp;' : '');
+      return '<span class="reveal-word-mask"><span class="reveal-word-inner">' + text + '</span></span>';
+    }).join('');
+    var inners = title.querySelectorAll('.reveal-word-inner');
+    gsap.set(inners, { yPercent: 110, opacity: 0 });
+    var anim = {
+      yPercent: 0, opacity: 1, duration: 0.9, ease: 'power3.out', stagger: 0.045,
+    };
+    if (hasST) {
+      anim.scrollTrigger = { trigger: title, start: 'top 88%', toggleActions: 'play none none none' };
+    }
+    gsap.to(inners, anim);
+  });
+})();
+
+/* Final CTA's primary button — the page's one "high-commitment" action
+   (site.css calls it out as deliberately the brightest thing on screen) —
+   gets a magnetic pull: it drifts toward the cursor within its own bounds
+   using gsap.quickTo (spring-like interpolation toward a target, not a
+   hard snap) rather than sitting as a static target. quickTo drives x/y
+   via its own inline transform, so on release it's reset to (0,0) instead
+   of left holding an offset if the pointer leaves fast. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (reduce || !canHover || typeof gsap === 'undefined') return;
+  var btn = document.querySelector('.cta .btn--primary');
+  if (!btn) return;
+
+  var PULL = 0.35;
+  var xTo = gsap.quickTo(btn, 'x', { duration: 0.4, ease: 'power3' });
+  var yTo = gsap.quickTo(btn, 'y', { duration: 0.4, ease: 'power3' });
+  btn.addEventListener('pointermove', function (e) {
+    var r = btn.getBoundingClientRect();
+    xTo((e.clientX - r.left - r.width / 2) * PULL);
+    yTo((e.clientY - r.top - r.height / 2) * PULL);
+  });
+  btn.addEventListener('pointerleave', function () {
+    xTo(0);
+    yTo(0);
+  });
+})();
+
+/* Top nav: hides on scroll-down past a small threshold, reappears on any
+   scroll-up (or once back near the very top) — standard "give the video/
+   content the full viewport while descending, but navigation is always
+   one scroll-up away" pattern. Threshold + a small dead-zone on the delta
+   keeps it from flickering on sub-pixel scroll jitter. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var topbar = document.querySelector('.sw-topbar');
+  if (reduce || !topbar) return;
+
+  var lastY = window.scrollY, ticking = false;
+  function update() {
+    ticking = false;
+    var y = Math.max(0, window.scrollY);
+    var delta = y - lastY;
+    if (y < 120) topbar.classList.remove('nav-hidden');
+    else if (delta > 4) topbar.classList.add('nav-hidden');
+    else if (delta < -4) topbar.classList.remove('nav-hidden');
+    lastY = y;
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  }, { passive: true });
+})();
+
+/* Testimonials: pins the quote stage (GSAP ScrollTrigger, same pin
+   mechanic as the Process sticky-stack) for a scroll distance proportional
+   to the quote count, and crossfades .testimonials__quote/.testimonials__dot
+   `is-active` based on scroll progress through that pinned range — the
+   "smooth transition on scroll" the section was asked for. A large quote-
+   mark glyph behind the stage drifts at its own independent scroll-linked
+   rate for the "parallax" half of the brief. Dots are also click-to-jump
+   (scrolls to the matching point in the pinned range) for anyone not
+   scrolling past this section at all. Falls back to a static first quote
+   (already `is-active` in the HTML) if GSAP/ScrollTrigger didn't load or
+   prefers-reduced-motion is set — nothing here is required to look
+   complete. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+  var section = document.querySelector('.testimonials');
+  var stage = section ? section.querySelector('.testimonials__stage') : null;
+  var quotes = section ? Array.prototype.slice.call(section.querySelectorAll('.testimonials__quote')) : [];
+  var dots = section ? Array.prototype.slice.call(section.querySelectorAll('.testimonials__dot')) : [];
+  if (!section || !stage || quotes.length < 2) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+  var n = quotes.length;
+  var current = 0;
+
+  function setActive(i) {
+    if (i === current) return;
+    current = i;
+    quotes.forEach(function (q, k) { q.classList.toggle('is-active', k === i); });
+    dots.forEach(function (d, k) { d.classList.toggle('is-active', k === i); });
+  }
+
+  var st = ScrollTrigger.create({
+    trigger: section,
+    start: 'top top',
+    end: '+=' + (n * 42) + '%',
+    pin: stage,
+    scrub: true,
+    onUpdate: function (self) {
+      setActive(Math.min(n - 1, Math.floor(self.progress * n)));
+    },
+  });
+
+  // Plain window.scrollTo rather than GSAP's ScrollToPlugin — that plugin
+  // isn't loaded on this page (just gsap.min.js + ScrollTrigger.min.js,
+  // kept dependency-free), so a gsap.to({ scrollTo }) call here would
+  // silently no-op.
+  dots.forEach(function (dot, i) {
+    dot.addEventListener('click', function () {
+      var target = st.start + (st.end - st.start) * ((i + 0.5) / n);
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    });
+  });
+
+  gsap.to('.testimonials__glyph', {
+    yPercent: 25,
+    ease: 'none',
+    scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: true },
   });
 })();
